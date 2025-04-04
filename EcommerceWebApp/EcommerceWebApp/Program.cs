@@ -65,15 +65,20 @@ builder.Services.AddDbContext<BaseDbContext>(options =>
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 // Register Services (Scoped)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Add HttpContextAccessor for CustomContext
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CustomContext>();
 builder.Services.AddLogging();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
 
 // Configure CORS
 builder.Services.AddCors(options =>

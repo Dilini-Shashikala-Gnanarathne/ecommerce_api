@@ -172,3 +172,6 @@ C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\o
 C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\obj\Debug\net8.0\ref\EcommerceWebApp.dll
 C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\Rizer\Desktop\Ecoomerce\ecommerce_api\EcommerceWebApp\EcommerceWebApp\bin\Debug\net8.0\Newtonsoft.Json.dll

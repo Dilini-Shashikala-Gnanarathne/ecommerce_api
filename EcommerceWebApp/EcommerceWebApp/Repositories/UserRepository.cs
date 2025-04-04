@@ -1,30 +1,13 @@
 ﻿using EcommerceWebApp.BaseDBEntities;
+using EcommerceWebApp.EcommerceDBEntities;
 using Microsoft.EntityFrameworkCore;
 
 
 public class UserRepository : IUserRepository
 {
-
-    //private readonly DbContextFactory _contextFactory;
-
-    //public UserRepository(DbContextFactory contextFactory)
-    //{
-    //    _contextFactory = contextFactory;
-    //}
-
-    //private DbContext GetContext(DbContextType contextType)
-    //{
-    //    return _contextFactory.GetContext(contextType);
-    //}
-
-    //public async Task<List<User>> GetAllUsers(DbContextType contextType)
-    //{
-    //    var context = GetContext(contextType);
-    //    return await context.Set<User>().ToListAsync();
-    //}
     private readonly BaseDbContext _context;
 
-    private readonly EcommerceDbContext _ecomcontext;
+    private readonly EcommerceDBContext _ecomcontext;
 
     public UserRepository(BaseDbContext context)
     {
