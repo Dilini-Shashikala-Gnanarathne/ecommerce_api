@@ -23,8 +23,8 @@ using System.Threading.Tasks;
 
         // POST: api/Product
         [HttpPost]
-        [PermissionAuthorization(Permissions.ViewProductsCust)]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductRequest request)
+    [PermissionAuthorization(Permissions.ViewProductsCust, Permissions.ViewProductsAdmin)]
+    public async Task<IActionResult> CreateProduct([FromBody] ProductRequest request)
         {
             if (!ModelState.IsValid)
             {

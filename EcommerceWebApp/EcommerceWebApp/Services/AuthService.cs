@@ -1,4 +1,5 @@
 ﻿using EcommerceWebApp.BaseDBEntities;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -8,25 +9,31 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
+    public AuthService(IUserRepository userRepository, IConfiguration configuration, ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
         _configuration = configuration;
-
+        _logger = logger;
     }
 
     public LoginResponse Login(LoginRequest request)
     {
+        _logger.LogInformation("Login attempt for user: {Username}", request.Username);
+
         // Find user by username
         User user = _userRepository.GetUserByUsername(request.Username);
         if (user == null || user.Password != request.Password) // In production, use password hashing
         {
+            _logger.LogWarning("Login failed for user: {Username}. User not found or invalid password.", request.Username);
             return null; // Authentication failed
         }
 
         // Generate token
         string token = GenerateJwtToken(user);
+
+        _logger.LogInformation("Login successful for user: {Username}", request.Username);
 
         return new LoginResponse
         {
@@ -38,15 +45,19 @@ public class AuthService : IAuthService
 
     public RegisterResponse Register(RegisterRequest request)
     {
+        _logger.LogInformation("Registration attempt for username: {Username}", request.Username);
+
         // Check if username already exists
         if (_userRepository.GetUserByUsername(request.Username) != null)
         {
+            _logger.LogWarning("Registration failed for username: {Username}. Username already taken.", request.Username);
             return null; // Username already taken
         }
 
         // Check if email already exists
         if (_userRepository.GetUserByEmail(request.Email) != null)
         {
+            _logger.LogWarning("Registration failed for email: {Email}. Email already registered.", request.Email);
             return null; // Email already registered
         }
 
@@ -66,6 +77,8 @@ public class AuthService : IAuthService
         // Save user
         User createdUser = _userRepository.CreateUser(user);
 
+        _logger.LogInformation("Registration successful for user: {Username}", createdUser.Username);
+
         return new RegisterResponse
         {
             Username = createdUser.Username,
@@ -76,6 +89,8 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(User user)
     {
+        _logger.LogInformation("Generating JWT token for user: {Username}", user.Username);
+
         string jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is missing.");
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -122,6 +137,10 @@ public class AuthService : IAuthService
             signingCredentials: credentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        string jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+        _logger.LogInformation("JWT token generated for user: {Username}", user.Username);
+
+        return jwtToken;
     }
 }

@@ -7,8 +7,17 @@ using System.Text;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using EcommerceWebApp.EcommerceDBEntities;
 using EcommerceWebApp.BaseDBEntities;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+// Add Serilog as the logging provider
+builder.Host.UseSerilog();
 
 // Add controllers
 builder.Services.AddControllers();
