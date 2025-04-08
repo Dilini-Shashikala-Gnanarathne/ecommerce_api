@@ -5,9 +5,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Serilog;
 using EcommerceWebApp.EcommerceDBEntities;
 using EcommerceWebApp.BaseDBEntities;
-using Serilog;
+using urbanMartAPI.Repositories;
+using EcommerceWebApp.Repositories.Interfaces;
+using EcommerceWebApp.Repositories.Implementations;
+using EcommerceWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Configure Serilog
@@ -75,11 +79,18 @@ builder.Services.AddDbContext<BaseDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
 // Register Services (Scoped)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ISalesReportService, SalesReportService>();
 
 // Add HttpContextAccessor for CustomContext
 builder.Services.AddHttpContextAccessor();

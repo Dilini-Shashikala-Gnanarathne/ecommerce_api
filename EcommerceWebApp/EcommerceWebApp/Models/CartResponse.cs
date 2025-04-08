@@ -1,5 +1,16 @@
-﻿public class CartResponse
+﻿using EcommerceWebApp.EcommerceDBEntities;
+
+public class CartResponse
 {
     public List<CartItemResponse> Items { get; set; } = new List<CartItemResponse>();
-    public decimal TotalPrice { get; set; }
+    
+    public long Id { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public string CreatedBy { get; set; } = null!;
+
+    public string? UserNic { get; set; }
 }

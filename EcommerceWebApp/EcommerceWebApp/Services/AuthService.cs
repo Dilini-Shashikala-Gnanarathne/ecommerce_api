@@ -1,4 +1,5 @@
-﻿using EcommerceWebApp.BaseDBEntities;
+﻿using AutoMapper;
+using EcommerceWebApp.BaseDBEntities;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,12 +11,14 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
+    private readonly IMapper _mapper;
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration, ILogger<AuthService> logger)
+    public AuthService(IUserRepository userRepository, IConfiguration configuration, ILogger<AuthService> logger, IMapper mapper)
     {
         _userRepository = userRepository;
         _configuration = configuration;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public LoginResponse Login(LoginRequest request)
@@ -35,12 +38,12 @@ public class AuthService : IAuthService
 
         _logger.LogInformation("Login successful for user: {Username}", request.Username);
 
-        return new LoginResponse
+        return _mapper.Map<LoginResponse>(new LoginResponse
         {
             Token = token,
             Username = user.Username,
             Role = user.Role
-        };
+        });
     }
 
     public RegisterResponse Register(RegisterRequest request)
@@ -79,12 +82,12 @@ public class AuthService : IAuthService
 
         _logger.LogInformation("Registration successful for user: {Username}", createdUser.Username);
 
-        return new RegisterResponse
+        return _mapper.Map<RegisterResponse>(new RegisterResponse
         {
             Username = createdUser.Username,
             Email = createdUser.Email,
             Role = createdUser.Role
-        };
+        });
     }
 
     private string GenerateJwtToken(User user)

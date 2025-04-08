@@ -1,41 +1,46 @@
 ﻿using AutoMapper;
 using EcommerceWebApp.EcommerceDBEntities;
+using EcommerceWebApp.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 public class ProductService : IProductService
 {
     private readonly EcommerceDBContext _context;
     private readonly CustomContext _customContext;
     private readonly IMapper _mapper;
-    private readonly ILogger<ProductService> _logger; // Inject ILogger
+    private readonly ILogger<ProductService> _logger;
+    private readonly IProductRepository _repository;
 
-    public ProductService(EcommerceDBContext context, CustomContext customContext, IMapper mapper, ILogger<ProductService> logger)
+    public ProductService(EcommerceDBContext context, CustomContext customContext, IMapper mapper, ILogger<ProductService> logger, IProductRepository repository)
     {
         _context = context;
         _customContext = customContext;
         _mapper = mapper;
-        _logger = logger; // Initialize logger
+        _logger = logger;
+        _repository = repository;
     }
 
-    public async Task<List<ProductResponse>> GetAllProductsAsync()
+    public async Task<List<ProductDto>> GetAllProductsAsync()
     {
-        _logger.LogInformation("Getting all products from the database");
-        var products = await _context.Products.ToListAsync();
-        _logger.LogInformation("Successfully retrieved {ProductCount} products", products.Count);
-        return _mapper.Map<List<ProductResponse>>(products);
+        _logger.LogInformation("Getting all products via repository");
+        var products = await _repository.GetAllProductsAsync();
+        _logger.LogInformation("Retrieved {ProductCount} products", products.Count);
+        return _mapper.Map<List<ProductDto>>(products);
     }
 
     public async Task<ProductResponse> GetProductByIdAsync(long id)
     {
-        _logger.LogInformation("Fetching product with ID {ProductId}", id);
-        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        _logger.LogInformation("Fetching product with ID {ProductId} via repository", id);
+        var product = await _repository.GetProductByIdAsync(id);
+
         if (product == null)
         {
             _logger.LogWarning("Product with ID {ProductId} not found", id);
             return null;
         }
+
         _logger.LogInformation("Successfully fetched product with ID {ProductId}", id);
         return _mapper.Map<ProductResponse>(product);
     }

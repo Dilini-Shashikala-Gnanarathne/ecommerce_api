@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommerceWebApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceWebApp.EcommerceDBEntities;
@@ -16,14 +17,13 @@ public partial class EcommerceDBContext : DbContext
     }
 
     public virtual DbSet<Cart> Carts { get; set; }
-
     public virtual DbSet<CartItem> CartItems { get; set; }
-
     public virtual DbSet<Order> Orders { get; set; }
-
     public virtual DbSet<OrderItem> OrderItems { get; set; }
-
     public virtual DbSet<Product> Products { get; set; }
+
+    // If you want to map a DTO to a stored procedure result
+    public virtual DbSet<CartWithItemsDto> CartWithItemsDto { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -31,6 +31,9 @@ public partial class EcommerceDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Add this inside the method
+        modelBuilder.Entity<CartWithItemsDto>().HasNoKey().ToView(null); // No table/view, only used for raw SQL/stored procedure
+
         modelBuilder.Entity<Cart>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Carts__3214EC07C261976A");
