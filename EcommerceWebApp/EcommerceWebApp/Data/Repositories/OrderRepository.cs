@@ -2,6 +2,8 @@
 using EcommerceWebApp.BaseDBEntities;
 using EcommerceWebApp.EcommerceDBEntities;
 using EcommerceWebApp.Models;
+using EcommerceWebApp.Models.EcommerceWebApp.Dtos;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -103,26 +105,95 @@ namespace urbanMartAPI.Repositories
             return orderCount == 0 ? 0 : totalRevenue / orderCount;
         }
 
-
-        //public async Task<IEnumerable<OrderItemData>> GetOrderItemDataAsync(DateTime startDate, DateTime endDate)
+        //---------------- Using LINQ with Joins ------------
+        /**
+         * Pros: Easy to read and maintain. Works well within the app, and don’t need extra setup.
+         * Cons: Can be slow for complex queries, especially with large data. Might use more memory if not optimized.
+         */
+        //public async Task<List<OrderReportDto>> GetOrderReportAsync(string status, DateTime startDate)
         //{
         //    var query = from o in _context.Orders
         //                join oi in _context.OrderItems on o.Id equals oi.OrderId
         //                join p in _context.Products on oi.ProductId equals p.Id
-        //                join ca in _context.Carts on o.OrderId equals ca.Id into cartGroup
-        //                from ca in cartGroup.DefaultIfEmpty()
-        //                where o.OrderDate >= startDate && o.OrderDate <= endDate
-        //                select new OrderItemData
+        //                where o.Status == status && o.CreatedAt >= startDate
+        //                orderby o.CreatedAt descending
+        //                select new OrderReportDto
         //                {
-        //                    Order = o,
-        //                    OrderItem = oi,
-        //                    Product = p,
-        //                    Cart = ca
+        //                    OrderId = o.OrderId,
+        //                    OrderName = o.OrderName,
+        //                    OrderTotalPrice = o.Price,
+        //                    OrderStatus = o.Status,
+        //                    OrderCreatedAt = o.CreatedAt,
+        //                    OrderCreatedBy = o.CreatedBy,
+        //                    OrderUserNic = o.UserNic,
+        //                    ProductId = oi.ProductId,
+        //                    OrderItemProductName = oi.ProductName,
+        //                    OrderItemQuantity = oi.Quantity,
+        //                    OrderItemUnitPrice = oi.UnitPrice,
+        //                    OrderItemTotalPrice = oi.Quantity * oi.UnitPrice,
+        //                    ProductName = p.Name,
+        //                    ProductPrice = p.Price,
+
         //                };
 
         //    return await query.ToListAsync();
         //}
 
+        //----------------  LINQ with AsNoTracking() ------------
+        /**
+         * Pros: Improves performance by not tracking changes, which makes it faster and uses less memory.
+         * Cons: You can’t modify the data once it’s fetched, and it might still be slow with large data.
+         */
+        //public async Task<List<OrderReportDto>> GetOrderReportAsync(string status, DateTime startDate)
+        //{
+        //    // Apply AsNoTracking to prevent change tracking and improve performance for read-only queries
+        //    var query = from o in _context.Orders.AsNoTracking() // Use AsNoTracking to avoid tracking
+        //                join oi in _context.OrderItems.AsNoTracking() on o.Id equals oi.OrderId // Apply AsNoTracking on the join too
+        //                join p in _context.Products.AsNoTracking() on oi.ProductId equals p.Id // Apply AsNoTracking on products
+        //                where o.Status == status && o.CreatedAt >= startDate
+        //                orderby o.CreatedAt descending
+        //                select new OrderReportDto
+        //                {
+        //                    OrderId = o.OrderId,
+        //                    OrderName = o.OrderName,
+        //                    OrderTotalPrice = o.Price,
+        //                    OrderStatus = o.Status,
+        //                    OrderCreatedAt = o.CreatedAt,
+        //                    OrderCreatedBy = o.CreatedBy,
+        //                    OrderUserNic = o.UserNic,
+        //                    ProductId = oi.ProductId,
+        //                    OrderItemProductName = oi.ProductName,
+        //                    OrderItemQuantity = oi.Quantity,
+        //                    OrderItemUnitPrice = oi.UnitPrice,
+        //                    OrderItemTotalPrice = oi.Quantity * oi.UnitPrice,
+        //                    ProductName = p.Name,
+        //                    ProductPrice = p.Price,
+        //                };
+
+        //    // Using ToListAsync to execute the query asynchronously and return the result
+        //    return await query.ToListAsync();
+        //}
+
+        //----------------  Stored Procedures------------
+        /**
+         * Pros: Very fast since the query runs directly on the database, reducing data transfer and processing time.
+         * Cons: Tied to a specific database, harder to change or debug, and requires managing database code separately.
+         */
+        public async Task<List<OrderReportDto>> GetOrderReportAsync(string status, DateTime startDate)
+        {
+            var statusParam = new SqlParameter("@Status", status);
+            var startDateParam = new SqlParameter("@StartDate", startDate);
+
+            var result = await _context.Set<OrderReportDto>().FromSqlRaw(
+                "EXEC GetOrderReport @Status, @StartDate",
+                statusParam,
+                startDateParam)
+                .ToListAsync();
+
+            return result;
+        }
+
     }
+
 }
 

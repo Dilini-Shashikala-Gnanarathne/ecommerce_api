@@ -1,5 +1,6 @@
 ﻿using EcommerceWebApp.EcommerceDBEntities;
 using EcommerceWebApp.Models;
+using EcommerceWebApp.Models.EcommerceWebApp.Dtos;
 public interface IOrderRepository
 {
     Task<List<Order>> GetAllOrdersAsync();
@@ -14,6 +15,7 @@ public interface IOrderRepository
     Task<List<CustomerSalesDto>> GetTopCustomersAsync(DateTime startDate, DateTime endDate);
     Task<decimal> GetAverageOrderValueAsync(DateTime startDate, DateTime endDate);
 
+    Task<List<OrderReportDto>> GetOrderReportAsync(string status, DateTime startDate);
     //Task<IEnumerable<OrderItemData>> GetOrderItemDataAsync(DateTime startDate, DateTime endDate);
 }
 

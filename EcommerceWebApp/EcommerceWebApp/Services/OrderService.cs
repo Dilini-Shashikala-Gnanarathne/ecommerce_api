@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EcommerceWebApp.EcommerceDBEntities;
+using EcommerceWebApp.Models.EcommerceWebApp.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -159,4 +160,11 @@ public class OrderService : IOrderService
             throw new Exception("The order was modified by another user. Please refresh and try again.");
         }
     }
+
+    public async Task<List<OrderReportDto>> GetOrderReportAsync(string status, DateTime startDate)
+    {
+        return await _orderRepository.GetOrderReportAsync(status, startDate);
+    }
+
+
 }
